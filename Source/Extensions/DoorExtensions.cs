@@ -15,7 +15,7 @@ namespace LockableDoors.Extensions
 		/// Injected prepatcher locked field on Building_Door object.
 		/// </summary>
 		[PrepatcherField]
-		[DefaultValue(false)]
+		[DefaultValue(true)]
 		public static extern ref bool IsLocked(this Building_Door target);
 
 		/// <summary>
@@ -29,7 +29,7 @@ namespace LockableDoors.Extensions
 		/// Injected prepatcher Gizmo field on Building_Door object.
 		/// </summary>
 		[PrepatcherField]
-		[DefaultValue(Exceptions.None)]
+		[DefaultValue(Exceptions.Colonists | Exceptions.Slaves | Exceptions.Pets | Exceptions.Allies | Exceptions.ColonyMechs)]
 		public static extern ref Exceptions LockExceptions(this Building_Door target);
 	}
 }

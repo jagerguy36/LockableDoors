@@ -37,9 +37,16 @@ namespace LockableDoors.Patches
 		[HarmonyPriority(Priority.First)]
 		internal static bool PawnCanOpenPrefix(Pawn p, ref bool __result, Building_Door __instance)
 		{
-			// If the door is not locked, continue as normal.
+			// If the door is not locked, allow all intelligent pawns. Animals are restricted as normal.
 			if (__instance.IsLocked() == false)
+			{
+				if(p.RaceProps.intelligence >= Intelligence.Humanlike)
+				{
+					__result = true;
+                    return false;
+                }
 				return true;
+            }
 
 			// Otherwise check for exceptions
 			Exceptions exceptions = __instance.LockExceptions();
