@@ -18,10 +18,15 @@ namespace LockableDoors.Extensions
 		[DefaultValue(true)]
 		public static extern ref bool IsLocked(this Building_Door target);
 
-		/// <summary>
-		/// Injected prepatcher Gizmo field on Building_Door object.
-		/// </summary>
-		[PrepatcherField]
+
+        [PrepatcherField]
+        [DefaultValue(true)]
+        public static extern ref bool WantedLocked(this Building_Door target);
+
+        /// <summary>
+        /// Injected prepatcher Gizmo field on Building_Door object.
+        /// </summary>
+        [PrepatcherField]
 		[DefaultValue(null)]
 		public static extern ref Verse.Command_Action ToggleLockGizmo(this Building_Door target);
 
@@ -29,7 +34,12 @@ namespace LockableDoors.Extensions
 		/// Injected prepatcher Gizmo field on Building_Door object.
 		/// </summary>
 		[PrepatcherField]
-		[DefaultValue(Exceptions.Colonists | Exceptions.Slaves | Exceptions.Pets | Exceptions.Allies | Exceptions.ColonyMechs)]
+		[DefaultValue(Exceptions.All)]
 		public static extern ref Exceptions LockExceptions(this Building_Door target);
-	}
+
+
+        [PrepatcherField]
+        [DefaultValue(Exceptions.All)]
+        public static extern ref Exceptions WantedExceptions(this Building_Door target);
+    }
 }

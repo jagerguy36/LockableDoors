@@ -8,6 +8,7 @@ using RimWorld;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -24,7 +25,7 @@ namespace LockableDoors.Tabs
 
 		public Gizmo[] CopyPasteButtons;
 
-		public override bool IsVisible => Mod.LockableDoorsMod.Settings.AllowExceptions && (SelThing as Building_Door)?.IsLocked() == true;
+		public override bool IsVisible => Mod.LockableDoorsMod.Settings.AllowExceptions && (SelThing as Building_Door)?.WantedLocked() == true;
 		public override bool Hidden => false;
 
 
@@ -32,7 +33,7 @@ namespace LockableDoors.Tabs
 		{
 			if (SelThing is Building_Door door)
 			{
-				ref Exceptions exceptions = ref door.LockExceptions();
+				ref Exceptions exceptions = ref door.WantedExceptions();
 
 				bool enabled = (exceptions & exception) == exception;
 				bool wasEnabled = enabled;
@@ -41,10 +42,17 @@ namespace LockableDoors.Tabs
 				if (wasEnabled != enabled)
 				{
 					exceptions ^= exception;
-
-					// Invalidate lock print state
-					DoorsPatches.InvalidateReachability(door);
-					door.Map.mapDrawer.MapMeshDirty(door.Position, DefOf.LDMapMeshFlagDefOf.DoorLocks);
+                    Designation designation = door.Map.designationManager.DesignationOn(door, ToggleJobUtility.DesDef);
+                    if (door.WantedExceptions() != door.LockExceptions() && designation == null)
+                    {
+                        door.Map.designationManager.AddDesignation(new Designation(door, ToggleJobUtility.DesDef));
+                    }
+                    else if (door.WantedLocked() == door.IsLocked() && door.WantedExceptions() == door.LockExceptions())
+                    {
+                        designation?.Delete();
+                    }
+                    // Invalidate lock print state
+                    door.Map.mapDrawer.MapMeshDirty(door.Position, DefOf.LDMapMeshFlagDefOf.DoorLocks);
 				}
 			}
 		}
@@ -86,7 +94,7 @@ namespace LockableDoors.Tabs
 		{
 			if (SelThing is Building_Door door)
 			{
-				_copiedExceptions = door.LockExceptions();
+				_copiedExceptions = door.WantedExceptions();
 			}
 		}
 
@@ -94,12 +102,20 @@ namespace LockableDoors.Tabs
 		{
 			foreach (Building_Door door in AllSelObjects.OfType<Building_Door>())
 			{
-				Exceptions exceptions = door.LockExceptions();
+				Exceptions exceptions = door.WantedExceptions();
 				if (exceptions != _copiedExceptions)
 				{
-					door.LockExceptions() = _copiedExceptions;
-					door.Map.mapDrawer.MapMeshDirty(door.Position, DefOf.LDMapMeshFlagDefOf.DoorLocks);
-					DoorsPatches.InvalidateReachability(door);
+					door.WantedExceptions() = _copiedExceptions;
+                    Designation designation = door.Map.designationManager.DesignationOn(door, ToggleJobUtility.DesDef);
+                    if (door.WantedExceptions() != door.LockExceptions() && designation == null)
+                    {
+                        door.Map.designationManager.AddDesignation(new Designation(door, ToggleJobUtility.DesDef));
+                    }
+                    else if (door.WantedLocked() == door.IsLocked() && door.WantedExceptions() == door.LockExceptions())
+                    {
+                        designation?.Delete();
+                    }
+                    door.Map.mapDrawer.MapMeshDirty(door.Position, DefOf.LDMapMeshFlagDefOf.DoorLocks);
 				}
 			}
 		}

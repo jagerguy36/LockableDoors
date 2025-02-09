@@ -15,5 +15,6 @@ namespace LockableDoors.Enums
 		Pets = 4,
 		Allies = 8,
 		ColonyMechs = 16,
-	}
+		All = Colonists|Slaves|Pets|Allies|ColonyMechs
+    }
 }

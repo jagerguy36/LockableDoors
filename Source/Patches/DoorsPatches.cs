@@ -6,6 +6,7 @@ using RimWorld;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using Verse;
@@ -29,8 +30,10 @@ namespace LockableDoors.Patches
 		internal static void ExposeDataPostfix(Building_Door __instance)
 		{
 			Scribe_Values.Look(ref __instance.IsLocked(), nameof(DoorExtensions.IsLocked));
-			Scribe_Values.Look(ref __instance.LockExceptions(), nameof(DoorExtensions.LockExceptions));
-		}
+            Scribe_Values.Look(ref __instance.WantedLocked(), nameof(DoorExtensions.WantedLocked));
+            Scribe_Values.Look(ref __instance.LockExceptions(), nameof(DoorExtensions.LockExceptions));
+            Scribe_Values.Look(ref __instance.WantedExceptions(), nameof(DoorExtensions.WantedExceptions));
+        }
 
 		// Where the actual magic happens! Prevent doors from being opened by anyone if locked.
 		[HarmonyLib.HarmonyPatch(nameof(Building_Door.PawnCanOpen)), HarmonyLib.HarmonyPrefix]
@@ -125,7 +128,7 @@ namespace LockableDoors.Patches
 				Verse.Command_Action togglebutton = __instance.ToggleLockGizmo();
 
 				// If no button is cached on this door, generate one.
-				bool locked = __instance.IsLocked();
+				bool locked = __instance.WantedLocked();
 				if (togglebutton == null)
 				{
 					togglebutton = new Verse.Command_Action()
@@ -156,14 +159,22 @@ namespace LockableDoors.Patches
 		/// <param name="action">The gizmo itself.</param>
 		private static void ToggleDoor(Building_Door door, Command_Action action)
 		{
-			ref bool locked = ref door.IsLocked();
-			locked = !locked;
+			ref bool locked = ref door.WantedLocked();
+            locked = !locked;
 			action!.defaultLabel = locked ? _lockedLabel : _unlockedLabel;
 			action!.icon = locked ? Mod.Textures.LockedIcon : Mod.Textures.UnlockedIcon;
-			InvalidateReachability(door);
+            Designation designation = door.Map.designationManager.DesignationOn(door, ToggleJobUtility.DesDef);
+            if (locked != door.IsLocked() && designation == null)
+			{
+                door.Map.designationManager.AddDesignation(new Designation(door, ToggleJobUtility.DesDef));
+            }
+			else if(locked == door.IsLocked() && door.WantedExceptions() == door.LockExceptions())
+			{
+                designation?.Delete();
+            }
 
-			// Invalidate lock print state
-			door.Map.mapDrawer.MapMeshDirty(door.Position, DefOf.LDMapMeshFlagDefOf.DoorLocks);
+            // Invalidate lock print state
+            door.Map.mapDrawer.MapMeshDirty(door.Position, DefOf.LDMapMeshFlagDefOf.DoorLocks);
 		}
 
 		public static void InvalidateReachability(Building_Door door)

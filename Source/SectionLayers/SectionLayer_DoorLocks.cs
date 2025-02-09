@@ -73,12 +73,17 @@ namespace LockableDoors.SectionLayers
 						{
 							GraphicsDef? lockGraphic;
 							if (door.LockExceptions() == Enums.Exceptions.None)
+							{
 								lockGraphic = GraphicsDefOf.LockedDoorGraphics;
-							else
-								lockGraphic = GraphicsDefOf.PartialLockedDoorGraphics;
-
-							lockGraphic?.graphicData?.GraphicColoredFor(door).Print(this, door, 0);
-							_bounds.Encapsulate(thing.OccupiedDrawRect());
+                                lockGraphic?.graphicData?.GraphicColoredFor(door).Print(this, door, 0);
+                                _bounds.Encapsulate(thing.OccupiedDrawRect());
+                            }
+							else if (door.LockExceptions() != Enums.Exceptions.All)
+							{
+                                lockGraphic = GraphicsDefOf.PartialLockedDoorGraphics;
+                                lockGraphic?.graphicData?.GraphicColoredFor(door).Print(this, door, 0);
+                                _bounds.Encapsulate(thing.OccupiedDrawRect());
+                            }
 						}
 					}
 				}
