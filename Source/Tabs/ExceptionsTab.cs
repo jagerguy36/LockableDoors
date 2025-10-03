@@ -1,4 +1,5 @@
-﻿using LockableDoors.Enums;
+﻿using LockableDoors.DefOf;
+using LockableDoors.Enums;
 using LockableDoors.Extensions;
 using LockableDoors.Mod;
 using LockableDoors.Patches;
@@ -42,10 +43,10 @@ namespace LockableDoors.Tabs
 				if (wasEnabled != enabled)
 				{
 					exceptions ^= exception;
-                    Designation designation = door.Map.designationManager.DesignationOn(door, ToggleJobUtility.DesDef);
+                    Designation designation = door.Map.designationManager.DesignationOn(door, AddedDefOf.Locks_DesignatorFlick);
                     if (door.WantedExceptions() != door.LockExceptions() && designation == null)
                     {
-                        door.Map.designationManager.AddDesignation(new Designation(door, ToggleJobUtility.DesDef));
+                        door.Map.designationManager.AddDesignation(new Designation(door, AddedDefOf.Locks_DesignatorFlick));
                     }
                     else if (door.WantedLocked() == door.IsLocked() && door.WantedExceptions() == door.LockExceptions())
                     {
@@ -106,10 +107,10 @@ namespace LockableDoors.Tabs
 				if (exceptions != _copiedExceptions)
 				{
 					door.WantedExceptions() = _copiedExceptions;
-                    Designation designation = door.Map.designationManager.DesignationOn(door, ToggleJobUtility.DesDef);
+                    Designation designation = door.Map.designationManager.DesignationOn(door, AddedDefOf.Locks_DesignatorFlick);
                     if (door.WantedExceptions() != door.LockExceptions() && designation == null)
                     {
-                        door.Map.designationManager.AddDesignation(new Designation(door, ToggleJobUtility.DesDef));
+                        door.Map.designationManager.AddDesignation(new Designation(door, AddedDefOf.Locks_DesignatorFlick));
                     }
                     else if (door.WantedLocked() == door.IsLocked() && door.WantedExceptions() == door.LockExceptions())
                     {

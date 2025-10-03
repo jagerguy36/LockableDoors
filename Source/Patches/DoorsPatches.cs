@@ -1,4 +1,5 @@
 ﻿using HarmonyLib;
+using LockableDoors.DefOf;
 using LockableDoors.Enums;
 using LockableDoors.Extensions;
 using LockableDoors.Tabs;
@@ -160,10 +161,10 @@ namespace LockableDoors.Patches
             locked = !locked;
 			action!.defaultLabel = locked ? _lockedLabel : _unlockedLabel;
 			action!.icon = locked ? Mod.Textures.LockedIcon : Mod.Textures.UnlockedIcon;
-            Designation designation = door.Map.designationManager.DesignationOn(door, ToggleJobUtility.DesDef);
+            Designation designation = door.Map.designationManager.DesignationOn(door, AddedDefOf.Locks_DesignatorFlick);
             if (locked != door.IsLocked() && designation == null)
 			{
-                door.Map.designationManager.AddDesignation(new Designation(door, ToggleJobUtility.DesDef));
+                door.Map.designationManager.AddDesignation(new Designation(door, AddedDefOf.Locks_DesignatorFlick));
             }
 			else if(locked == door.IsLocked() && door.WantedExceptions() == door.LockExceptions())
 			{

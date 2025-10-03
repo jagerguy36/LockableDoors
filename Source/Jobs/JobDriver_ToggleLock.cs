@@ -1,4 +1,5 @@
-﻿using LockableDoors.Enums;
+﻿using LockableDoors.DefOf;
+using LockableDoors.Enums;
 using LockableDoors.Extensions;
 using LockableDoors.Patches;
 using RimWorld;
@@ -20,7 +21,7 @@ namespace LockableDoors
         {
             this.FailOn(delegate
             {
-                Designation designation = Map.designationManager.DesignationOn(TargetThingA, ToggleJobUtility.DesDef);
+                Designation designation = Map.designationManager.DesignationOn(TargetThingA, AddedDefOf.Locks_DesignatorFlick);
                 return designation == null;
             });
             yield return Toils_Reserve.Reserve(TargetIndex.A, 1, -1, null);
@@ -49,7 +50,7 @@ namespace LockableDoors
 
                 SoundDefOf.FlickSwitch.PlayOneShot(new TargetInfo(door.Position, door.Map, false));
                 DoorsPatches.InvalidateReachability(door);
-                Designation designation = Map.designationManager.DesignationOn(door, ToggleJobUtility.DesDef);
+                Designation designation = Map.designationManager.DesignationOn(door, AddedDefOf.Locks_DesignatorFlick);
                 if (designation != null)
                 {
                     designation.Delete();
