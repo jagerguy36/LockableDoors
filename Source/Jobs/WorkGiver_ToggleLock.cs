@@ -9,7 +9,6 @@ namespace LockableDoors
 {
     public class WorkGiver_ToggleLock : WorkGiver_Scanner
     {
-        [DebuggerHidden]
         public override IEnumerable<Thing> PotentialWorkThingsGlobal(Pawn pawn)
         {
             List<Designation> desList = pawn.Map.designationManager.designationsByDef[AddedDefOf.Locks_DesignatorFlick];
@@ -17,6 +16,11 @@ namespace LockableDoors
             {
                 yield return desList[i].target.Thing;
             }
+        }
+
+        public override bool ShouldSkip(Pawn pawn, bool forced = false)
+        {
+            return !pawn.Map.designationManager.AnySpawnedDesignationOfDef(AddedDefOf.Locks_DesignatorFlick);
         }
 
         public override bool HasJobOnThing(Pawn pawn, Thing t, bool forced = false)
@@ -27,8 +31,6 @@ namespace LockableDoors
 
         public override Job JobOnThing(Pawn pawn, Thing t, bool forced = false)
         {
-
-            ThingWithComps door = (ThingWithComps)t;
             return new Job(AddedDefOf.Locks_JobFlick, t);
         }
     }

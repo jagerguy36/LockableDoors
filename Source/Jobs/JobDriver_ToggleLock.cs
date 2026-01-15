@@ -16,45 +16,27 @@ namespace LockableDoors
 {
     public class JobDriver_ToggleLock : JobDriver
     {
-        [DebuggerHidden]
         protected override IEnumerable<Toil> MakeNewToils()
         {
-            this.FailOn(delegate
-            {
-                Designation designation = Map.designationManager.DesignationOn(TargetThingA, AddedDefOf.Locks_DesignatorFlick);
-                return designation == null;
-            });
+            this.FailOnDespawnedOrNull(TargetIndex.A);
+            this.FailOn(() => base.Map.designationManager.DesignationOn(base.TargetThingA, AddedDefOf.Locks_DesignatorFlick) == null);
             yield return Toils_Reserve.Reserve(TargetIndex.A, 1, -1, null);
             yield return Toils_Goto.GotoThing(TargetIndex.A, PathEndMode.Touch);
             yield return Toils_General.Wait(15).FailOnCannotTouch(TargetIndex.A, PathEndMode.Touch);
-            Toil toil = new Toil();
+            Toil toil = ToilMaker.MakeToil("MakeNewToils");
             toil.initAction = delegate
             {
                 Pawn actor = toil.actor;
                 Building_Door door = (Building_Door)actor.CurJob.targetA.Thing;
 
-
-                Exceptions wantedState = door.WantedExceptions();
-                Exceptions currentState = door.LockExceptions();
                 bool wantedLocked = door.WantedLocked();
-                bool currentLocked = door.IsLocked();
-
-                if (currentState != wantedState)
-                {
-                    door.LockExceptions() = wantedState;
-                }
-                if (currentLocked != wantedLocked)
-                {
-                    door.IsLocked() = wantedLocked;
-                }
+                Exceptions wantedState = door.WantedExceptions();
+                door.IsLocked() = wantedLocked;
+                door.LockExceptions() = wantedState;
 
                 SoundDefOf.FlickSwitch.PlayOneShot(new TargetInfo(door.Position, door.Map, false));
                 DoorsPatches.InvalidateReachability(door);
-                Designation designation = Map.designationManager.DesignationOn(door, AddedDefOf.Locks_DesignatorFlick);
-                if (designation != null)
-                {
-                    designation.Delete();
-                }
+                door.Map.designationManager.DesignationOn(door, AddedDefOf.Locks_DesignatorFlick)?,Delete();
                 door.Map.mapDrawer.MapMeshDirty(door.Position, DefOf.LDMapMeshFlagDefOf.DoorLocks);
             };
 
