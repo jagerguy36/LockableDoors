@@ -35,7 +35,7 @@ namespace LockableDoors
 
                 SoundDefOf.FlickSwitch.PlayOneShot(new TargetInfo(door.Position, door.Map, false));
                 DoorsPatches.InvalidateReachability(door);
-                door.Map.designationManager.DesignationOn(door, AddedDefOf.Locks_DesignatorFlick)?,Delete();
+                door.Map.designationManager.DesignationOn(door, AddedDefOf.Locks_DesignatorFlick)?.Delete();
                 door.Map.mapDrawer.MapMeshDirty(door.Position, DefOf.LDMapMeshFlagDefOf.DoorLocks);
             };
 
