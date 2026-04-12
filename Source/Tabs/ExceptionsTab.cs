@@ -25,7 +25,7 @@ namespace LockableDoors.Tabs
 
 		public Gizmo[] CopyPasteButtons;
 
-		public override bool IsVisible => Mod.LockableDoorsMod.Settings.AllowExceptions && (SelThing as Building_Door)?.WantedLocked() == true;
+		public override bool IsVisible => SelThing.Faction == Faction.OfPlayer && Mod.LockableDoorsMod.Settings.AllowExceptions && (SelThing as Building_Door)?.WantedLocked() == true;
 		public override bool Hidden => false;
 
 

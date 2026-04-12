@@ -48,8 +48,13 @@ namespace LockableDoors.Patches
                 }
 				return true;
             }
+			if (__instance.Faction != Faction.OfPlayer)
+			{
+				return true;
+			}
 
 			// Otherwise check for exceptions
+			// Exception means they are not hindered by the lock
 			Exceptions exceptions = __instance.LockExceptions();
 			if (exceptions != Exceptions.None && Mod.LockableDoorsMod.Settings.AllowExceptions)
 			{
